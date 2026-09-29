@@ -1,0 +1,21 @@
+{
+  "name": "RG Review Form",
+  "modal_heading": "Share your thoughts",
+  "success_message": "Thank you for your review. Your review has been submitted and is awaiting approval.",
+  "name_label": "Your name",
+  "email_label": "Email",
+  "title_label": "Review title (optional)",
+  "body_label": "Your review",
+  "rating_label": "Rating",
+  "required_hint": "Required",
+  "submit_label": "Submit review",
+  "product_missing": "Add this block to a product page to collect reviews.",
+  "display": {
+    "product_missing": "Add this block to a product page to show reviews.",
+    "loading": "Loading reviews…",
+    "based_on_zero": "Based on 0 reviews",
+    "empty_title": "No reviews yet",
+    "empty_text": "Be the first to leave a review.",
+    "load_more": "Load more"
+  }
+}

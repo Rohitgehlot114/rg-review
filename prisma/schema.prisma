@@ -1,0 +1,147 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Note that some adapters may set a maximum length for the String type by default, please ensure your strings are long
+// enough when changing adapters.
+// See https://www.prisma.io/docs/orm/reference/prisma-schema-reference#string for more information
+datasource db {
+  provider = "sqlite"
+  url      = "file:dev.sqlite"
+}
+
+model Session {
+  id            String    @id
+  shop          String
+  state         String
+  isOnline      Boolean   @default(false)
+  scope         String?
+  expires       DateTime?
+  accessToken   String
+  userId        BigInt?
+  firstName     String?
+  lastName      String?
+  email         String?
+  accountOwner  Boolean   @default(false)
+  locale        String?
+  collaborator  Boolean?  @default(false)
+  emailVerified Boolean?  @default(false)
+  refreshToken        String?
+  refreshTokenExpires DateTime?
+}
+
+model Review {
+  id           String   @id @default(cuid())
+  publicToken  String   @unique @default(cuid())
+  shop         String
+  productId    String?
+  productTitle String?
+  customerName String?
+  customerEmail String?
+  rating       Int
+  title        String?
+  body         String
+  status       String
+  verifiedPurchase Boolean @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  reward ReviewReward?
+  votes ReviewVote[]
+
+  @@index([shop])
+  @@index([shop, status])
+  @@index([shop, productId])
+  @@index([shop, createdAt])
+  @@index([shop, verifiedPurchase])
+}
+
+model ReviewVote {
+  id        String   @id @default(cuid())
+  shop      String
+  reviewId  String
+  voterKey  String
+  helpful   Boolean
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@unique([shop, reviewId, voterKey])
+  @@index([shop, reviewId])
+}
+
+model ReviewRequest {
+  id            String    @id @default(cuid())
+  shop          String
+  token         String    @unique
+  customerName  String?
+  customerEmail String
+  productId     String
+  productTitle  String?
+  status        String
+  sentAt         DateTime?
+  completedAt    DateTime?
+  expiresAt      DateTime?
+  lastReminderAt DateTime?
+  reminderCount  Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([shop])
+  @@index([shop, status])
+  @@index([shop, customerEmail])
+  @@index([shop, productId])
+  @@index([shop, createdAt])
+}
+
+model RewardSettings {
+  id              String   @id @default(cuid())
+  shop            String   @unique
+  enabled         Boolean  @default(false)
+  trigger         String   @default("published")
+  discountType    String   @default("percentage")
+  discountValue   Decimal  @default(0)
+  expirationDays  Int?
+  minimumPurchase Decimal?
+  usageLimit      Int      @default(1)
+  onePerCustomer  Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model ReviewReward {
+  id                String    @id @default(cuid())
+  shop              String
+  reviewId          String    @unique
+  requestId         String?
+  productId         String?
+  productTitle      String?
+  customerName      String?
+  customerEmail     String
+  discountType      String
+  discountValue     Decimal
+  currencyCode      String
+  discountCode      String
+  shopifyDiscountId String?
+  usageLimit        Int       @default(1)
+  minimumPurchase   Decimal?
+  status            String
+  emailStatus       String    @default("pending")
+  expiresAt         DateTime?
+  issuedAt          DateTime  @default(now())
+  redeemedAt        DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Restrict)
+
+  @@unique([shop, discountCode])
+  @@index([shop])
+  @@index([shop, status])
+  @@index([shop, customerEmail])
+  @@index([shop, productId])
+}

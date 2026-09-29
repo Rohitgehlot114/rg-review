@@ -1,0 +1,23 @@
+<div
+  class="rg-rating-show"
+  data-rg-rating-show
+  data-product-id="{{ product.id }}"
+  data-endpoint="/apps/rg-review/reviews"
+  {{ block.shopify_attributes }}
+>
+  <span class="rg-rating-show__stars" aria-label="Loading product rating"></span>
+  <span class="rg-rating-show__count">Loading reviews…</span>
+</div>
+
+{% schema %}
+{
+  "name": "RG Review Rating Show",
+  "target": "section",
+  "stylesheet": "rating-show.css",
+  "javascript": "rating-show.js",
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "settings": []
+}
+{% endschema %}

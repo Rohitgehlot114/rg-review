@@ -1,0 +1,48 @@
+.rg-product-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+  color: #777;
+  font-size: 0.82rem;
+  line-height: 1.2;
+  text-decoration: none;
+  transition:
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.rg-product-review-button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0.35rem 0;
+  cursor: pointer;
+}
+
+.rg-product-review-button:hover {
+  text-decoration: underline;
+}
+
+.rg-product-rating__stars {
+  letter-spacing: 0.04em;
+  font-size: 0.95rem;
+}
+
+.rg-product-rating__star--filled {
+  color: #e87918;
+}
+
+.rg-product-rating__star--empty {
+  color: #222;
+}
+
+.rg-product-rating__count {
+  color: #777;
+}
+
+.rg-product-rating:hover .rg-product-rating__count {
+  color: #222;
+  text-decoration: underline;
+  transform: translateY(-1px);
+}

@@ -1,0 +1,28 @@
+.rg-rating-show {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.45rem;
+  color: #222;
+  font-size: 0.9rem;
+  line-height: 1.2;
+}
+
+.rg-rating-show__stars {
+  display: inline-flex;
+  gap: 0.08rem;
+  letter-spacing: 0;
+  font-size: 1.05rem;
+}
+
+.rg-rating-show__star--filled {
+  color: #e87918;
+}
+
+.rg-rating-show__star--empty {
+  color: #222;
+}
+
+.rg-rating-show__count {
+  color: #222;
+}

@@ -1,0 +1,18 @@
+{
+  "name": "RG Review Form",
+  "settings": {
+    "heading": "Heading",
+    "intro": "Introduction text",
+    "product": "Product"
+  },
+  "display": {
+    "block_name": "RG Review Reviews",
+    "settings": {
+      "heading": "Heading",
+      "reviews_per_load": "Reviews per load",
+      "show_summary": "Show rating summary",
+      "show_dates": "Show review dates",
+      "product": "Product"
+    }
+  }
+}
