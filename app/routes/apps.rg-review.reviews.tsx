@@ -410,7 +410,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
           rating: submission.rating,
           title: submission.title,
           body: submission.body,
-          status: "published",
+          status: "pending",
         },
         select: {
           id: true,

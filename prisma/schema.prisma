@@ -57,6 +57,8 @@ model Review {
   @@index([shop, productId])
   @@index([shop, createdAt])
   @@index([shop, verifiedPurchase])
+  @@index([shop, status, createdAt])
+  @@index([shop, rating, createdAt])
 }
 
 model ReviewVote {
@@ -96,6 +98,9 @@ model ReviewRequest {
   @@index([shop, customerEmail])
   @@index([shop, productId])
   @@index([shop, createdAt])
+  @@index([shop, status, createdAt])
+  @@index([shop, status, expiresAt])
+  @@index([shop, productId, createdAt])
 }
 
 model RewardSettings {

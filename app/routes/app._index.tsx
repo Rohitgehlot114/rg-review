@@ -3,7 +3,6 @@ import { useLoaderData } from "react-router";
 import { authenticate } from "../shopify.server";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import prisma from "../db.server";
-import { expireOpenReviewRequests } from "../utils/review-requests.server";
 import {
   RECENT_REVIEWS_LIMIT,
   formatAverageRating,
@@ -19,8 +18,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const shop = session.shop;
 
   try {
-    await expireOpenReviewRequests(shop);
-
     const [totalReviews, published, pending, aggregate, recentReviews, requestPending, requestSent, requestCompleted] =
       await Promise.all([
         prisma.review.count({ where: { shop } }),
