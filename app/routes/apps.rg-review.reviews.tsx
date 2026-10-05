@@ -412,7 +412,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
           body: submission.body,
           status: "published",
         },
-        select: { id: true },
+        select: {
+          id: true,
+          publicToken: true,
+          customerName: true,
+          rating: true,
+          title: true,
+          body: true,
+          createdAt: true,
+          productTitle: true,
+          verifiedPurchase: true,
+        },
       });
     });
 
@@ -427,7 +437,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       );
     }
 
-    await recordVerifiedPurchase({
+    void recordVerifiedPurchase({
       admin,
       shop,
       reviewId: created.id,
@@ -439,6 +449,15 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       ok: true,
       message:
         "Thank you for your review. Your review has been submitted and is awaiting approval.",
+      review: {
+        ...mapPublishedReviewForStorefront({
+          ...created,
+          helpfulCount: 0,
+          unhelpfulCount: 0,
+          viewerVote: null,
+        }),
+        productId: submission.productNumericId,
+      },
     });
   } catch {
     return jsonResponse(

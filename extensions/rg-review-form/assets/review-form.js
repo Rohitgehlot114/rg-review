@@ -86,7 +86,11 @@
           }
           form.reset();
           form.hidden = true;
-          document.dispatchEvent(new CustomEvent("rg-review:submitted"));
+          document.dispatchEvent(
+            new CustomEvent("rg-review:submitted", {
+              detail: { review: result.data.review || null },
+            }),
+          );
           var reviews = document.querySelector("[data-rg-reviews-display]");
           if (reviews) {
             reviews.scrollIntoView({ behavior: "smooth", block: "start" });
