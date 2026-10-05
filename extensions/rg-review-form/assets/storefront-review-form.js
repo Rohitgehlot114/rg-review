@@ -15,6 +15,11 @@ window.ShopifyReviewForm = function mountReviewForm(panel, root, close) {
     <div class="sr-hp" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off"></label></div>
     <div class="sr-form__foot"><p class="sr-form__note">Reviews are checked before they appear.</p><button class="sr-btn" type="submit"></button></div>`;
   form.querySelector('p').textContent = root.dataset.productTitle || '';
+  const productTitle = document.createElement('input');
+  productTitle.type = 'hidden';
+  productTitle.name = 'productTitle';
+  productTitle.value = root.dataset.productTitle || '';
+  form.append(productTitle);
   form.querySelector('[type="submit"]').textContent = root.dataset.submit || 'Submit review';
   const picker = form.querySelector('.sr-picker');
   for (let star = 5; star >= 1; star -= 1) {

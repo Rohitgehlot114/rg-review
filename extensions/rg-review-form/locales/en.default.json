@@ -1,7 +1,7 @@
 {
   "name": "RG Review Form",
   "modal_heading": "Share your thoughts",
-  "success_message": "Thank you for your review. Your review has been submitted and is awaiting approval.",
+  "success_message": "Thank you for your review. It is now published on this product.",
   "name_label": "Your name",
   "email_label": "Email",
   "title_label": "Review title (optional)",

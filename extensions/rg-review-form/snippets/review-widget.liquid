@@ -1,0 +1,40 @@
+{% comment %}
+  Full review section. The body embed must not render this snippet.
+{% endcomment %}
+<section
+  id="shopify-product-reviews-{{ product.id }}"
+  class="shopify-reviews shopify-review-widget"
+  tabindex="-1"
+  aria-label="{{ heading | default: 'Customer Reviews' | escape }}"
+  data-review-widget
+  data-placement="{{ placement | default: 'section' | escape }}"
+  data-shop="{{ shop.permanent_domain | escape }}"
+  data-product-id="{{ product.id }}"
+  data-product-title="{{ product.title | escape }}"
+  data-per-page="{{ per_page | default: 5 }}"
+  data-show-form="{% if show_form %}true{% else %}false{% endif %}"
+  data-show-name="{% if show_name != false %}true{% else %}false{% endif %}"
+  data-show-date="{% if show_date != false %}true{% else %}false{% endif %}"
+  data-show-verified="{% if show_verified != false %}true{% else %}false{% endif %}"
+  data-show-histogram="{% if show_histogram != false %}true{% else %}false{% endif %}"
+  data-show-sort="{% if show_sort != false %}true{% else %}false{% endif %}"
+  data-show-avatar="{% if show_avatar != false %}true{% else %}false{% endif %}"
+  data-sort="{{ default_sort | default: 'newest' | escape }}"
+  data-empty="{{ empty_message | default: 'No reviews yet' | escape }}"
+  data-empty-body="{{ empty_body | default: 'Be the first to share your thoughts on this product.' | escape }}"
+  data-submit="{{ submit_label | default: 'Submit review' | escape }}"
+  data-write="{{ write_label | default: 'Write a review' | escape }}"
+  data-form-src="{{ 'review-form.js' | asset_url }}"
+  style="--sr-star: {{ accent | default: '#F5B301' }}; --sr-star-empty: {{ empty_star | default: '#D9DDE3' }}; --sr-accent: {{ button_color | default: '#111111' }}; --sr-radius: {{ radius | default: 14 }}px;"
+>
+  <h2 class="sr__title">{{ heading | default: 'Customer Reviews' | escape }}</h2>
+  <div class="sr__top" data-summary aria-busy="true" aria-hidden="true">
+    <div><div class="sr-skel" style="height:48px;width:90px;margin:0 auto 10px"></div><div class="sr-skel" style="width:120px;margin:auto"></div></div>
+    <div style="display:grid;gap:12px"><div class="sr-skel"></div><div class="sr-skel" style="width:80%"></div><div class="sr-skel" style="width:60%"></div></div>
+    <div class="sr-skel" style="height:46px;width:160px"></div>
+  </div>
+  <div data-form-panel hidden></div>
+  <div class="sr__toolbar" data-toolbar hidden></div>
+  <ul class="sr__list" data-list></ul>
+  <div class="sr__more"><button type="button" class="sr-btn sr-btn--ghost" data-more hidden>Load more</button></div>
+</section>

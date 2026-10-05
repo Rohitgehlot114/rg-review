@@ -7,6 +7,7 @@ import {
   formatAverageForApi,
   mapPublishedReviewForStorefront,
   parsePublishedReviewsQuery,
+  privacyDisplayName,
   publishedReviewsWhere,
 } from "../utils/published-reviews.server";
 import { recordVerifiedPurchase } from "../services/purchase-verification.server";
@@ -122,6 +123,110 @@ async function authenticateAppProxy(request: Request) {
   }
 }
 
+function widgetData(data: unknown, status = 200) {
+  return Response.json(
+    { success: status < 400, ...(status < 400 ? { data } : { error: data }) },
+    { status, headers: { "Cache-Control": "private, no-store" } },
+  );
+}
+
+async function allReviewsWidget(shop: string, url: URL) {
+  const sortParam = url.searchParams.get("sort");
+  const sort =
+    sortParam === "highest" || sortParam === "lowest" || sortParam === "newest"
+      ? sortParam
+      : "newest";
+  const ratingParam = url.searchParams.get("rating");
+  const rating = ratingParam ? Number.parseInt(ratingParam, 10) : null;
+  if (ratingParam && (!Number.isInteger(rating) || rating! < 1 || rating! > 5)) {
+    return widgetData({ code: "INVALID_REVIEW", message: "The review list filters are invalid" }, 400);
+  }
+  const requestedLimit = Number.parseInt(url.searchParams.get("limit") ?? "6", 10);
+  const limit = Number.isFinite(requestedLimit)
+    ? Math.min(20, Math.max(1, requestedLimit))
+    : 6;
+  const cursorValue = url.searchParams.get("cursor");
+  let offset = 0;
+  if (cursorValue) {
+    const parsed = Number.parseInt(Buffer.from(cursorValue, "base64url").toString("utf8"), 10);
+    if (!Number.isInteger(parsed) || parsed < 0 || parsed > 10_000) {
+      return widgetData({ code: "INVALID_CURSOR", message: "Cursor is invalid" }, 400);
+    }
+    offset = parsed;
+  }
+
+  const where = {
+    shop,
+    status: "published" as const,
+    ...(rating ? { rating } : {}),
+  };
+  const orderBy =
+    sort === "highest"
+      ? [{ rating: "desc" as const }, { createdAt: "desc" as const }]
+      : sort === "lowest"
+        ? [{ rating: "asc" as const }, { createdAt: "desc" as const }]
+        : [{ createdAt: "desc" as const }];
+  const [rows, groups] = await Promise.all([
+    prisma.review.findMany({
+      where,
+      orderBy,
+      skip: offset,
+      take: limit + 1,
+      select: {
+        rating: true,
+        title: true,
+        body: true,
+        customerName: true,
+        verifiedPurchase: true,
+        createdAt: true,
+        productTitle: true,
+      },
+    }),
+    prisma.review.groupBy({
+      by: ["rating"],
+      where: { shop, status: "published" },
+      _count: { _all: true },
+    }),
+  ]);
+  const hasMore = rows.length > limit;
+  const reviews = (hasMore ? rows.slice(0, limit) : rows).map((review) => ({
+    rating: review.rating,
+    title: review.title,
+    body: review.body,
+    displayName: privacyDisplayName(review.customerName),
+    verifiedPurchase: review.verifiedPurchase,
+    submittedAt: review.createdAt.toISOString(),
+    product: review.productTitle
+      ? { title: review.productTitle, url: null, imageUrl: null }
+      : null,
+  }));
+  const distribution = { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 };
+  let totalReviews = 0;
+  let ratingTotal = 0;
+  for (const group of groups) {
+    const key = String(group.rating) as keyof typeof distribution;
+    if (distribution[key] === undefined) continue;
+    distribution[key] = group._count._all;
+    totalReviews += group._count._all;
+    ratingTotal += group.rating * group._count._all;
+  }
+
+  return widgetData({
+    reviews,
+    nextCursor: hasMore
+      ? Buffer.from(String(offset + reviews.length), "utf8").toString("base64url")
+      : null,
+    averageRating: totalReviews ? Math.round((ratingTotal / totalReviews) * 10) / 10 : null,
+    totalReviews,
+    distribution,
+    showAllReviewsTab: true,
+    reviewsButtonPosition: "middle-right",
+    reviewsButtonHorizontalOffset: 0,
+    reviewsButtonVerticalOffset: 50,
+    reviewsButtonOrientation: "vertical",
+  });
+}
+
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const auth = await authenticateAppProxy(request);
   if (!auth.ok) return auth.response;
@@ -141,6 +246,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
   const shop = session.shop;
   const url = new URL(request.url);
+  if (url.searchParams.get("format") === "json") {
+    return allReviewsWidget(shop, url);
+  }
   const parsed = parsePublishedReviewsQuery(url);
 
   if (parsed.error) {
@@ -404,7 +512,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
           rating: submission.rating,
           title: submission.title,
           body: submission.body,
-          status: "pending",
+          status: "published",
         },
         select: {
           id: true,
@@ -445,7 +553,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     return jsonResponse({
       ok: true,
       message:
-        "Thank you for your review. Your review has been submitted and is awaiting approval.",
+        "Thank you for your review. It is now published on this product.",
       review: {
         ...mapPublishedReviewForStorefront({
           ...created,

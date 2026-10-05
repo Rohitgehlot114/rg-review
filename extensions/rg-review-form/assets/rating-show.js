@@ -28,10 +28,9 @@
     if (!productId || !endpoint || container.dataset.loaded === "true") return;
     container.dataset.loaded = "true";
     fetch(
-      endpoint +
-        "?product_id=" +
+      "/apps/rg-review/products/" +
         encodeURIComponent(productId) +
-        "&limit=1&offset=0",
+        "/reviews?limit=1",
       {
         headers: { Accept: "application/json" },
         credentials: "same-origin",
@@ -39,8 +38,12 @@
     )
       .then(function (response) {
         return response.json().then(function (data) {
-          if (!response.ok || !data.ok) throw new Error("reviews");
-          return data.summary || { count: 0, averageRating: null };
+          if (!response.ok || !data.success) throw new Error("reviews");
+          var payload = data.data || {};
+          return {
+            count: payload.totalReviews || 0,
+            averageRating: payload.averageRating,
+          };
         });
       })
       .then(function (summary) {

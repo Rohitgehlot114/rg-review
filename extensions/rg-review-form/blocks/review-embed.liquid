@@ -1,0 +1,15 @@
+{% comment %}
+  Compatibility embed. This block used to render the full review list and form
+  at the end of the page body, which placed the form in the footer.
+  The full widget now renders only from the Product reviews section block.
+{% endcomment %}
+
+{% schema %}
+{
+  "name": "Customer reviews embed",
+  "target": "body",
+  "settings": [
+    {"type": "paragraph", "content": "This embed no longer shows the review form. Add the Product reviews block to the product template instead."}
+  ]
+}
+{% endschema %}

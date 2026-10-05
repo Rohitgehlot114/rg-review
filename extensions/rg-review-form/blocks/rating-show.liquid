@@ -1,23 +1,100 @@
-<div
-  class="rg-rating-show"
-  data-rg-rating-show
-  data-product-id="{{ product.id }}"
-  data-endpoint="/apps/rg-review/reviews"
-  {{ block.shopify_attributes }}
->
-  <span class="rg-rating-show__stars" aria-label="Loading product rating"></span>
-  <span class="rg-rating-show__count">Loading reviews…</span>
-</div>
+{% if block.settings.enabled %}
+  <div
+    class="shopify-review-rating-source"
+    data-rating-source
+    data-page-type="{{ request.page_type }}"
+    data-click="{% if block.settings.click_to_reviews %}true{% else %}false{% endif %}"
+    data-show-count="{% if block.settings.show_count %}true{% else %}false{% endif %}"
+    data-show-number="{% if block.settings.show_number %}true{% else %}false{% endif %}"
+    data-half-stars="{% if block.settings.half_stars %}true{% else %}false{% endif %}"
+    data-count-format="{{ block.settings.count_format | escape }}"
+    data-precision="{{ block.settings.precision | default: '1' | escape }}"
+    data-empty-text="{{ block.settings.empty_text | escape }}"
+    data-write-text="{{ block.settings.write_text | escape }}"
+    data-star="{{ block.settings.star_color }}"
+    data-empty="{{ block.settings.empty_star_color }}"
+    data-star-size="{{ block.settings.star_size }}"
+    data-text-size="{{ block.settings.text_size }}"
+    data-space="{{ block.settings.spacing }}"
+    data-align="{{ block.settings.alignment | escape }}"
+    data-hide-empty="{% if block.settings.hide_when_empty %}true{% else %}false{% endif %}"
+  >
+    {% case request.page_type %}
+      {% when 'collection' %}
+        {% for product in collection.products %}
+          {% render 'product-rating',
+            product: product,
+            placement: 'embed',
+            hidden: true,
+            star_color: block.settings.star_color,
+            empty_color: block.settings.empty_star_color,
+            star_size: block.settings.star_size,
+            text_size: block.settings.text_size,
+            show_count: block.settings.show_count,
+            show_number: block.settings.show_number,
+            half_stars: block.settings.half_stars,
+            count_format: block.settings.count_format,
+            precision: block.settings.precision,
+            alignment: block.settings.alignment,
+            spacing: block.settings.spacing,
+            click_to_reviews: block.settings.click_to_reviews,
+            empty_text: block.settings.empty_text,
+            write_text: block.settings.write_text,
+            hide_when_empty: block.settings.hide_when_empty
+          %}
+        {% endfor %}
+      {% when 'search' %}
+        {% for item in search.results %}
+          {% if item.object_type == 'product' %}
+            {% render 'product-rating',
+              product: item,
+              placement: 'embed',
+              hidden: true,
+              star_color: block.settings.star_color,
+              empty_color: block.settings.empty_star_color,
+              star_size: block.settings.star_size,
+              text_size: block.settings.text_size,
+              show_count: block.settings.show_count,
+            show_number: block.settings.show_number,
+            half_stars: block.settings.half_stars,
+            count_format: block.settings.count_format,
+              precision: block.settings.precision,
+              alignment: block.settings.alignment,
+              spacing: block.settings.spacing,
+              click_to_reviews: block.settings.click_to_reviews,
+              empty_text: block.settings.empty_text,
+              write_text: block.settings.write_text,
+              hide_when_empty: block.settings.hide_when_empty
+            %}
+          {% endif %}
+        {% endfor %}
+    {% endcase %}
+  </div>
+{% endif %}
 
 {% schema %}
 {
-  "name": "RG Review Rating Show",
-  "target": "section",
-  "stylesheet": "rating-show.css",
-  "javascript": "rating-show.js",
-  "enabled_on": {
-    "templates": ["product"]
-  },
-  "settings": []
+  "name": "Product ratings",
+  "target": "body",
+  "javascript": "product-rating.js",
+  "stylesheet": "review-widgets.css",
+  "settings": [
+    {"type": "checkbox", "id": "enabled", "label": "Show rating", "default": true},
+    {"type": "color", "id": "star_color", "label": "Star color", "default": "#F5B301"},
+    {"type": "color", "id": "empty_star_color", "label": "Empty star color", "default": "#D9DDE3"},
+    {"type": "range", "id": "star_size", "label": "Star size", "min": 16, "max": 32, "step": 1, "unit": "px", "default": 20},
+    {"type": "range", "id": "text_size", "label": "Rating text size", "min": 12, "max": 24, "step": 1, "unit": "px", "default": 14},
+    {"type": "checkbox", "id": "show_count", "label": "Show review count", "default": true},
+    {"type": "checkbox", "id": "show_number", "label": "Show rating number", "default": true},
+    {"type": "checkbox", "id": "half_stars", "label": "Show partial stars", "default": true},
+    {"type": "select", "id": "precision", "label": "Rating precision", "default": "1", "options": [{"value": "1", "label": "One decimal"}]},
+    {"type": "select", "id": "alignment", "label": "Alignment", "default": "left", "options": [{"value": "left", "label": "Left"}, {"value": "center", "label": "Center"}, {"value": "right", "label": "Right"}]},
+    {"type": "range", "id": "spacing", "label": "Spacing", "min": 0, "max": 24, "step": 1, "unit": "px", "default": 8},
+    {"type": "checkbox", "id": "click_to_reviews", "label": "Scroll to reviews when selected", "default": true},
+    {"type": "checkbox", "id": "hide_when_empty", "label": "Hide when there are no reviews", "default": false},
+    {"type": "text", "id": "empty_text", "label": "Empty state text", "default": "Be the first to review."},
+    {"type": "text", "id": "write_text", "label": "Empty state link", "default": "Write a review"},
+    {"type": "select", "id": "count_format", "label": "Review count format", "default": "words", "options": [{"value": "words", "label": "126 reviews"}, {"value": "compact", "label": "(126)"}]}
+  ]
 }
 {% endschema %}

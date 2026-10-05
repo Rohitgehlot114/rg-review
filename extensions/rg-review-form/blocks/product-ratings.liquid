@@ -1,14 +1,56 @@
-<div data-rg-product-ratings-embed></div>
+{% comment %}Product rating{% endcomment %}
+<div {{ block.shopify_attributes }}>
+{% if block.settings.enabled and product %}
+  {% render 'product-rating',
+    product: product,
+    placement: 'section',
+    hidden: false,
+    star_color: block.settings.star_color,
+    empty_color: block.settings.empty_star_color,
+    star_size: block.settings.star_size,
+    text_size: block.settings.text_size,
+    show_count: block.settings.show_count,
+    show_number: block.settings.show_number,
+    half_stars: block.settings.half_stars,
+    count_format: block.settings.count_format,
+    precision: block.settings.precision,
+    alignment: block.settings.alignment,
+    spacing: block.settings.spacing,
+    click_to_reviews: block.settings.click_to_reviews,
+    empty_text: block.settings.empty_text,
+    write_text: block.settings.write_text,
+    hide_when_empty: block.settings.hide_when_empty
+  %}
+{% endif %}
+
+</div>
 
 {% schema %}
 {
-  "name": "RG Review Product Ratings",
+  "name": "Product rating",
   "target": "section",
-  "stylesheet": "product-ratings.css",
-  "javascript": "product-ratings.js",
   "enabled_on": {
     "templates": ["product", "collection", "index", "search"]
   },
-  "settings": []
+  "javascript": "product-rating.js",
+  "stylesheet": "review-widgets.css",
+  "settings": [
+    {"type": "checkbox", "id": "enabled", "label": "Show rating", "default": true},
+    {"type": "color", "id": "star_color", "label": "Star color", "default": "#F5B301"},
+    {"type": "color", "id": "empty_star_color", "label": "Empty star color", "default": "#D9DDE3"},
+    {"type": "range", "id": "star_size", "label": "Star size", "min": 16, "max": 32, "step": 1, "unit": "px", "default": 20},
+    {"type": "range", "id": "text_size", "label": "Rating text size", "min": 12, "max": 24, "step": 1, "unit": "px", "default": 14},
+    {"type": "checkbox", "id": "show_count", "label": "Show review count", "default": true},
+    {"type": "checkbox", "id": "show_number", "label": "Show rating number", "default": true},
+    {"type": "checkbox", "id": "half_stars", "label": "Show partial stars", "default": true},
+    {"type": "select", "id": "precision", "label": "Rating precision", "default": "1", "options": [{"value": "1", "label": "One decimal"}]},
+    {"type": "select", "id": "alignment", "label": "Alignment", "default": "left", "options": [{"value": "left", "label": "Left"}, {"value": "center", "label": "Center"}, {"value": "right", "label": "Right"}]},
+    {"type": "range", "id": "spacing", "label": "Spacing", "min": 0, "max": 24, "step": 1, "unit": "px", "default": 8},
+    {"type": "checkbox", "id": "click_to_reviews", "label": "Scroll to reviews when selected", "default": true},
+    {"type": "checkbox", "id": "hide_when_empty", "label": "Hide when there are no reviews", "default": false},
+    {"type": "text", "id": "empty_text", "label": "Empty state text", "default": "Be the first to review."},
+    {"type": "text", "id": "write_text", "label": "Empty state link", "default": "Write a review"},
+    {"type": "select", "id": "count_format", "label": "Review count format", "default": "words", "options": [{"value": "words", "label": "126 reviews"}, {"value": "compact", "label": "(126)"}]}
+  ]
 }
 {% endschema %}

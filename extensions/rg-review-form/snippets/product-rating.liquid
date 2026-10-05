@@ -1,0 +1,23 @@
+{% comment %}
+  Compact rating only. This snippet must not render the full review list or form.
+  data-product-title is intentionally omitted. Placement uses the product id.
+{% endcomment %}
+<div
+  class="shopify-review-rating"
+  {% if hidden %}hidden{% endif %}
+  data-product-rating
+  data-product-id="{{ product.id }}"
+  data-shopify-review-rating-product-id="{{ product.id }}"
+  data-product-handle="{{ product.handle | escape }}"
+  data-placement="{{ placement | default: 'section' | escape }}"
+  data-click="{% if click_to_reviews %}true{% else %}false{% endif %}"
+  data-show-count="{% if show_count %}true{% else %}false{% endif %}"
+  data-show-number="{% if show_number != false %}true{% else %}false{% endif %}"
+  data-half-stars="{% if half_stars != false %}true{% else %}false{% endif %}"
+  data-count-format="{{ count_format | escape }}"
+  data-precision="{{ precision | default: '1' | escape }}"
+  data-empty-text="{{ empty_text | escape }}"
+  data-write-text="{{ write_text | escape }}"
+  data-hide-empty="{% if hide_when_empty %}true{% else %}false{% endif %}"
+  style="--sr-star: {{ star_color | default: '#F5B301' }}; --sr-star-empty: {{ empty_color | default: '#D9DDE3' }}; --rating-size: {{ star_size | default: 20 }}px; --rating-text: {{ text_size | default: 14 }}px; --rating-space: {{ spacing | default: 8 }}px; text-align: {{ alignment | default: 'left' }};"
+></div>

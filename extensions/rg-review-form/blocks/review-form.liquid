@@ -1,137 +1,15 @@
-{% liquid
-  assign product_ref = product
-  if block.settings.product != blank
-    assign product_ref = block.settings.product
-  endif
-%}
-
-<div
-  class="rg-review"
-  data-rg-review-root
-  {{ block.shopify_attributes }}
->
-  {% if product_ref == blank %}
-    <p class="rg-review__notice">{{ 'product_missing' | t }}</p>
-  {% else %}
-    <div class="rg-review__modal" data-rg-review-modal hidden>
-      <div class="rg-review__card" role="dialog" aria-modal="true" aria-labelledby="rg-review-heading-{{ block.id }}">
-        <button class="rg-review__close" type="button" data-rg-review-close aria-label="Close">
-          ×
-        </button>
-        <h2 class="rg-review__heading" id="rg-review-heading-{{ block.id }}">{{ 'modal_heading' | t }}</h2>
-      <div
-        class="rg-review__success"
-        data-rg-review-success
-        hidden
-        role="status"
-        aria-live="polite"
-      >
-        {{ 'success_message' | t }}
-      </div>
-
-      <form
-        class="rg-review__form"
-        data-rg-review-form
-        method="post"
-        action="/apps/rg-review/reviews"
-        novalidate
-      >
-        <input type="hidden" name="product_id" value="{{ product_ref.id }}">
-
-        <div class="rg-review__field" data-field="rating">
-          <fieldset class="rg-review__rating">
-            <legend class="rg-review__label">
-              {{ 'rating_label' | t }}
-              <span class="rg-review__required">{{ 'required_hint' | t }}</span>
-            </legend>
-            <div class="rg-review__stars" role="radiogroup" aria-label="{{ 'rating_label' | t }}">
-              {% for i in (1..5) %}
-                {% assign star_value = 6 | minus: i %}
-                <label class="rg-review__star">
-                  <input
-                    type="radio"
-                    name="rating"
-                    value="{{ star_value }}"
-                    {% if star_value == 1 %}required{% endif %}
-                  >
-                  <span aria-hidden="true">★</span>
-                  <span class="rg-review__sr-only">{{ star_value }} star{% if star_value != 1 %}s{% endif %}</span>
-                </label>
-              {% endfor %}
-            </div>
-          </fieldset>
-          <p class="rg-review__error" data-error-for="rating" hidden></p>
-        </div>
-
-        <div class="rg-review__field" data-field="title">
-          <label class="rg-review__label" for="rg-review-title-{{ block.id }}">
-            {{ 'title_label' | t }}
-          </label>
-          <input
-            id="rg-review-title-{{ block.id }}"
-            class="rg-review__input"
-            type="text"
-            name="title"
-            maxlength="120"
-            autocomplete="off"
-          >
-          <p class="rg-review__error" data-error-for="title" hidden></p>
-        </div>
-
-        <div class="rg-review__field" data-field="body">
-          <label class="rg-review__label" for="rg-review-body-{{ block.id }}">
-            {{ 'body_label' | t }}
-            <span class="rg-review__required">{{ 'required_hint' | t }}</span>
-          </label>
-          <textarea
-            id="rg-review-body-{{ block.id }}"
-            class="rg-review__textarea"
-            name="body"
-            rows="5"
-            maxlength="5000"
-            required
-          ></textarea>
-          <p class="rg-review__error" data-error-for="body" hidden></p>
-        </div>
-
-        <p class="rg-review__error rg-review__error--form" data-error-for="form" hidden></p>
-
-        <button class="rg-review__submit" type="submit" data-rg-review-submit>
-          {{ 'submit_label' | t }}
-        </button>
-      </form>
-      </div>
-    </div>
-  {% endif %}
-</div>
+<div class="pr-reviews-tab-host" data-all-reviews-tab data-shop="{{ shop.permanent_domain | escape }}" hidden></div>
+<script src="{{ 'all-reviews-tab.js' | asset_url }}" defer></script>
 
 {% schema %}
 {
-  "name": "RG Review Form",
-  "target": "section",
-  "stylesheet": "review-form.css",
-  "javascript": "review-form.js",
-  "enabled_on": {
-    "templates": ["product"]
-  },
+  "name": "Product Reviews",
+  "target": "body",
+  "stylesheet": "review-widgets.css",
   "settings": [
     {
-      "type": "text",
-      "id": "heading",
-      "label": "t:settings.heading",
-      "default": "Write a review"
-    },
-    {
-      "type": "textarea",
-      "id": "intro",
-      "label": "t:settings.intro",
-      "default": "Share your experience with this product. Reviews are moderated before they appear on the store."
-    },
-    {
-      "type": "product",
-      "id": "product",
-      "label": "t:settings.product",
-      "autofill": true
+      "type": "paragraph",
+      "content": "Shows the storefront Reviews button. Position, orientation, and offsets are saved in the Product Reviews app. The button stays hidden when that app setting is off."
     }
   ]
 }

@@ -232,7 +232,7 @@ export const action = async ({
   return {
     ok: true,
     message:
-      "Thank you for your review. Your review has been submitted and is awaiting approval.",
+      "Thank you for your review. It is now published on this product.",
   };
 };
 

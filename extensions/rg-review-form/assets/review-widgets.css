@@ -1,0 +1,854 @@
+.shopify-reviews,
+.shopify-review-rating {
+  --sr-star: #F5B301;
+  --sr-star-empty: #D9DDE3;
+  --sr-accent: #111111;
+  --sr-accent-text: #fff;
+  --sr-text: currentColor;
+  --sr-muted: #6b7280;
+  --sr-border: #e7e7e9;
+  --sr-surface: #fff;
+  --sr-surface-alt: #f7f7f8;
+  --sr-verified: #0f7b4b;
+  --sr-radius: 14px;
+  color: var(--sr-text);
+  font: inherit;
+  line-height: 1.5;
+}
+
+.shopify-review-rating {
+  min-height: 1.6em;
+  margin: var(--rating-space, 8px) 0;
+  font-size: var(--rating-text, 14px);
+}
+
+.sr-rating__link,
+.shopify-reviews a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.sr-rating__link {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 8px;
+  min-height: 44px;
+  border-radius: 8px;
+}
+
+.sr-rating__link:focus-visible,
+.shopify-reviews :focus-visible {
+  outline: 2px solid var(--sr-accent);
+  outline-offset: 3px;
+}
+
+.sr-rating__text {
+  color: var(--sr-muted);
+}
+
+.sr-rating__text strong {
+  color: var(--sr-text);
+  font-weight: 700;
+}
+
+.sr-stars {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+  gap: 2px;
+  line-height: 0;
+  --s: var(--rating-size, 20px);
+}
+
+.sr-stars--summary { --s: 22px; }
+.sr-stars--card { --s: 18px; }
+.sr-stars--empty { --s: 24px; }
+
+.sr-star {
+  position: relative;
+  width: var(--s, 20px);
+  height: var(--s, 20px);
+  flex: 0 0 auto;
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.sr-star svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.sr-star .bg {
+  fill: var(--sr-star-empty);
+}
+
+.sr-star .fg {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--f, 0) * 100%);
+  overflow: hidden;
+}
+
+.sr-star .fg svg {
+  width: var(--s, 20px);
+  height: var(--s, 20px);
+  max-width: none;
+}
+
+.sr-star .fg path {
+  fill: var(--sr-star);
+}
+
+.shopify-reviews {
+  max-width: 920px;
+  margin: 28px auto;
+  padding: 8px 0 4px;
+}
+
+.shopify-reviews .sr__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 18px;
+}
+
+.shopify-reviews .sr__heading .sr-btn {
+  flex: 0 0 auto;
+  width: auto;
+}
+
+.shopify-reviews .sr__title {
+  margin: 0 0 18px;
+  font-size: clamp(22px, 2.4vw, 28px);
+  letter-spacing: -0.02em;
+}
+
+.shopify-reviews .sr__heading .sr__title {
+  margin: 0;
+}
+
+.shopify-reviews .sr__top {
+  display: grid;
+  grid-template-columns: auto minmax(160px, 1fr) minmax(148px, max-content);
+  gap: var(--sr-gap, 24px);
+  align-items: center;
+  padding: 22px;
+  border: 1px solid var(--sr-border);
+  border-radius: var(--sr-radius);
+  background: var(--sr-surface);
+}
+
+.shopify-reviews .sr__top.sr__top--empty {
+  display: flex;
+  justify-content: center;
+}
+
+.shopify-reviews .sr__score {
+  text-align: center;
+  min-width: 120px;
+}
+
+.shopify-reviews .sr__avg {
+  font-size: 46px;
+  line-height: 1;
+  font-weight: 720;
+  letter-spacing: -0.03em;
+}
+
+.shopify-reviews .sr__avg span,
+.shopify-reviews .sr__based {
+  color: var(--sr-muted);
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.shopify-reviews .sr__bars {
+  display: grid;
+  gap: 7px;
+}
+
+.shopify-reviews .sr__bar {
+  display: grid;
+  grid-template-columns: 34px 1fr 28px;
+  gap: 10px;
+  align-items: center;
+  background: none;
+  border: 0;
+  padding: 2px;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  border-radius: 6px;
+}
+
+.shopify-reviews .sr__bar[disabled] {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.shopify-reviews .sr__bar[aria-pressed="true"] .sr__track {
+  outline: 2px solid var(--sr-accent);
+}
+
+.shopify-reviews .sr__bar-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.shopify-reviews .sr__bar-label svg {
+  width: 14px;
+  height: 14px;
+  fill: var(--sr-star);
+}
+
+.shopify-reviews .sr__track {
+  display: block;
+  height: 8px;
+  min-width: 0;
+  border-radius: 99px;
+  background: var(--sr-surface-alt);
+  overflow: hidden;
+}
+
+.shopify-reviews .sr__fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--sr-star);
+  border-radius: inherit;
+  transition: width 180ms ease;
+}
+
+.shopify-reviews .sr__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.shopify-reviews .sr__actions .sr-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.shopify-reviews .sr__bar-n {
+  font-size: 13px;
+  color: var(--sr-muted);
+  text-align: right;
+}
+
+.shopify-reviews .sr-btn[hidden] {
+  display: none !important;
+}
+
+.shopify-reviews .sr-btn {
+  appearance: none;
+  border: 0;
+  background: var(--sr-accent);
+  color: var(--sr-accent-text);
+  font: inherit;
+  font-weight: 650;
+  padding: 12px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.shopify-reviews .sr-btn--ghost {
+  background: transparent;
+  color: var(--sr-text);
+  border: 1px solid var(--sr-border);
+}
+
+.shopify-reviews .sr__toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin: 22px 0 8px;
+  color: var(--sr-muted);
+  font-size: 14px;
+}
+
+.shopify-reviews .sr__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 8px;
+  border: 1px solid var(--sr-border);
+  background: var(--sr-surface-alt);
+  border-radius: 999px;
+  padding: 2px 8px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.shopify-reviews .sr-select {
+  border: 1px solid var(--sr-border);
+  background: var(--sr-surface);
+  color: inherit;
+  font: inherit;
+  border-radius: 10px;
+  padding: 8px 10px;
+  min-height: 40px;
+}
+
+.shopify-reviews .sr__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.shopify-reviews .sr-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--sr-border);
+}
+
+.shopify-reviews .sr-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a1a1a;
+  background: hsl(var(--h, 210) 70% 88%);
+}
+
+.shopify-reviews .sr-card__head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+}
+
+.shopify-reviews .sr-card__name,
+.shopify-reviews .sr-card__title,
+.shopify-reviews .sr-card__body,
+.shopify-reviews .sr-card__product {
+  overflow-wrap: anywhere;
+}
+
+.shopify-reviews .sr-card__name {
+  font-weight: 700;
+}
+
+.shopify-reviews .sr-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--sr-verified);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.shopify-reviews .sr-verified svg {
+  width: 14px;
+  height: 14px;
+}
+
+.shopify-reviews .sr-card__date {
+  margin-left: auto;
+  color: var(--sr-muted);
+  font-size: 13px;
+}
+
+.shopify-reviews .sr-card__title {
+  margin: 6px 0 0;
+  font-size: 16px;
+}
+
+.shopify-reviews .sr-card__product {
+  margin: 8px 0 0;
+  color: var(--sr-muted);
+  font-size: 13px;
+}
+
+.shopify-reviews .sr-card__product a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.shopify-reviews .sr-card__body {
+  margin: 6px 0 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.shopify-reviews .sr-card__body.is-open {
+  display: block;
+  -webkit-line-clamp: unset;
+}
+
+.shopify-reviews .sr-more {
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  font-weight: 650;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 4px 0;
+  min-height: 44px;
+}
+
+.shopify-reviews .sr__more {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.shopify-reviews .sr-empty {
+  text-align: center;
+  border: 1px dashed var(--sr-border);
+  border-radius: var(--sr-radius);
+  padding: 36px 16px;
+  width: min(100%, 420px);
+  margin-inline: auto;
+  box-sizing: border-box;
+}
+
+.shopify-reviews .sr-empty h3,
+.shopify-reviews .sr-empty p {
+  margin: 8px 0;
+}
+
+.shopify-reviews .sr-skel {
+  height: 12px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--sr-surface-alt), #fff, var(--sr-surface-alt));
+  background-size: 200% 100%;
+  animation: sr-shimmer 1.2s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shopify-reviews .sr-skel {
+    animation: none;
+  }
+}
+
+@keyframes sr-shimmer {
+  to { background-position: -200% 0; }
+}
+
+.pr-reviews-tab-host {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  overflow: hidden !important;
+}
+
+.pr-reviews-tab {
+  position: fixed !important;
+  z-index: 9999 !important;
+  display: block !important;
+  width: max-content !important;
+  height: max-content !important;
+  max-width: max-content !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  pointer-events: none !important;
+  writing-mode: horizontal-tb !important;
+}
+
+.pr-reviews-tab__face {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 8px;
+  width: max-content !important;
+  height: max-content !important;
+  max-width: max-content !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 12px 0 0 12px;
+  background: #111 !important;
+  color: #fff !important;
+  font: 700 14px/1 Arial, Helvetica, sans-serif !important;
+  letter-spacing: 0.04em;
+  padding: 14px 10px !important;
+  cursor: pointer;
+  pointer-events: auto !important;
+  box-sizing: border-box !important;
+  line-height: 1 !important;
+}
+
+.pr-reviews-tab[data-orientation="horizontal"] .pr-reviews-tab__face {
+  flex-direction: row;
+  writing-mode: horizontal-tb;
+  border-radius: 12px;
+}
+
+.pr-reviews-tab[data-orientation="vertical"] .pr-reviews-tab__face {
+  flex-direction: column;
+  writing-mode: vertical-rl;
+}
+
+.pr-reviews-tab__face svg {
+  width: 16px !important;
+  height: 16px !important;
+  flex: 0 0 auto;
+  fill: #f5b301;
+  writing-mode: horizontal-tb;
+}
+
+.sr-tab-modal:not([hidden]) {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  background: rgba(17, 17, 17, 0.55);
+}
+
+.sr-tab-dialog {
+  width: min(1080px, 100%);
+  max-height: min(86vh, 820px);
+  overflow: auto;
+  background: #fff;
+  color: #202223;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.24);
+}
+
+.sr-tab-dialog__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  padding-bottom: 12px;
+}
+
+.sr-tab-dialog__summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+}
+
+.sr-tab-dialog__close {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #e3e3e3;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.sr-tab-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.sr-tab-card {
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  min-width: 0;
+}
+
+.sr-tab-card__photo {
+  display: block;
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  background: #f6f6f7;
+}
+
+.sr-tab-card__body {
+  display: grid;
+  gap: 6px;
+  padding: 10px;
+}
+
+.sr-tab-card__body h3,
+.sr-tab-card__body p {
+  margin: 0;
+}
+
+.sr-tab-card__body p {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.sr-tab-card__who {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  font-size: 13px;
+}
+
+.sr-tab-card__verified {
+  color: #0f7b4b;
+  font-size: 12px;
+}
+
+.sr-tab-card__date,
+.sr-tab-card__product {
+  color: #6d7175;
+  font-size: 12px;
+}
+
+.sr-tab__stars {
+  display: inline-flex;
+  gap: 1px;
+}
+
+.sr-tab__stars .sr-star {
+  width: 16px;
+  height: 16px;
+}
+
+.sr-tab-more {
+  display: block;
+  margin: 16px auto 0;
+  min-height: 44px;
+  border: 1px solid #c9cccf;
+  border-radius: 999px;
+  background: #fff;
+  padding: 10px 18px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.sr-tab-status {
+  margin: 8px 0 0;
+  color: #6d7175;
+}
+
+.sr-modal:not([hidden]) {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483000;
+  display: grid;
+  place-items: center;
+  width: auto !important;
+  max-width: none !important;
+  height: auto !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 24px 16px;
+  background: rgba(17, 17, 17, 0.55);
+  overflow: auto;
+}
+
+.shopify-reviews .sr-form {
+  margin-top: 16px;
+  padding: 18px;
+  border: 1px solid var(--sr-border);
+  border-radius: var(--sr-radius);
+  background: var(--sr-surface);
+}
+
+.sr-modal .sr-form {
+  margin: 0;
+  width: min(560px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.24);
+}
+
+.shopify-reviews .sr-form__head,
+.shopify-reviews .sr-form__foot,
+.shopify-reviews .sr-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+}
+
+.shopify-reviews .sr-form h3,
+.shopify-reviews .sr-form p {
+  margin: 0;
+}
+
+.shopify-reviews .sr-close {
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 24px;
+  cursor: pointer;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.shopify-reviews .sr-field {
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+  border: 0;
+  padding: 0;
+  min-width: 0;
+  flex: 1;
+}
+
+.shopify-reviews .sr-field legend,
+.shopify-reviews .sr-field label {
+  font-weight: 650;
+}
+
+.shopify-reviews .opt,
+.shopify-reviews .sr-hint,
+.shopify-reviews .sr-form__note {
+  color: var(--sr-muted);
+  font-weight: 400;
+  font-size: 13px;
+}
+
+.shopify-reviews .sr-picker {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  gap: 2px;
+}
+
+.shopify-reviews .sr-picker input {
+  position: absolute;
+  opacity: 0;
+}
+
+.shopify-reviews .sr-picker label {
+  cursor: pointer;
+}
+
+.shopify-reviews .sr-picker svg {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  fill: var(--sr-star-empty);
+}
+
+.shopify-reviews .sr-picker label:hover svg,
+.shopify-reviews .sr-picker label:hover ~ label svg,
+.shopify-reviews .sr-picker input:checked ~ label svg,
+.shopify-reviews .sr-picker input:focus-visible + label svg {
+  fill: var(--sr-star);
+}
+
+.shopify-reviews .sr-picker input:focus-visible + label {
+  outline: 2px solid var(--sr-accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.shopify-reviews .sr-picker-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.shopify-reviews .sr-input {
+  width: 100%;
+  border: 1px solid var(--sr-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font: inherit;
+  color: inherit;
+  background: var(--sr-surface);
+  min-height: 44px;
+}
+
+.shopify-reviews textarea.sr-input {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.shopify-reviews .sr-hint {
+  display: flex;
+  justify-content: space-between;
+}
+
+.shopify-reviews .sr-err {
+  color: #b42318;
+  font-size: 13px;
+}
+
+.shopify-reviews .sr-hp {
+  position: absolute;
+  left: -9999px;
+}
+
+.shopify-reviews .sr-success {
+  text-align: center;
+  padding: 12px;
+}
+
+.shopify-reviews .tick {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 8px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #e8f6ee;
+}
+
+@media (max-width: 860px) {
+  .shopify-reviews .sr__top {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 749px) {
+  .shopify-review-rating .sr-stars { --s: 18px; }
+  .sr-stars--summary { --s: 20px; }
+  .sr-stars--card { --s: 16px; }
+  .shopify-reviews .sr-picker svg { width: 20px; height: 20px; }
+}
+
+@media (max-width: 520px) {
+  .shopify-reviews .sr-form__head,
+  .shopify-reviews .sr-form__foot,
+  .shopify-reviews .sr-row,
+  .shopify-reviews .sr__toolbar {
+    display: grid;
+  }
+
+  .shopify-reviews .sr-avatar {
+    display: none;
+  }
+
+  .shopify-reviews .sr-card {
+    grid-template-columns: 1fr;
+  }
+
+  .shopify-reviews .sr-card__date {
+    margin-left: 0;
+  }
+}

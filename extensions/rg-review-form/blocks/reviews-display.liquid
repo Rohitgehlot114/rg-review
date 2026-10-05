@@ -1,147 +1,54 @@
-{% liquid
-  assign product_ref = product
-  if block.settings.product != blank
-    assign product_ref = block.settings.product
-  endif
-
-  assign per_load = block.settings.reviews_per_load | default: 10
-  if per_load < 1
-    assign per_load = 10
-  endif
-  if per_load > 20
-    assign per_load = 20
-  endif
+<div {{ block.shopify_attributes }}>
+{% render 'review-widget',
+  placement: 'section',
+  heading: block.settings.heading,
+  accent: block.settings.accent_color,
+  empty_star: block.settings.empty_star_color,
+  button_color: block.settings.button_color,
+  radius: block.settings.corner_radius,
+  per_page: block.settings.reviews_per_page,
+  default_sort: block.settings.default_sort,
+  show_form: block.settings.show_form,
+  show_name: block.settings.show_customer_name,
+  show_date: block.settings.show_date,
+  show_verified: block.settings.show_verified_badge,
+  show_histogram: block.settings.show_histogram,
+  show_sort: block.settings.show_sort,
+  show_avatar: block.settings.show_avatar,
+  empty_message: block.settings.empty_message,
+  write_label: block.settings.write_label,
+  submit_label: block.settings.submit_label
 %}
 
-<div
-  class="rg-reviews-display"
-  id="rg-review-reviews"
-  data-rg-reviews-display
-  data-product-id="{{ product_ref.id }}"
-  data-limit="{{ per_load }}"
-  data-show-summary="{% if block.settings.show_summary %}true{% else %}false{% endif %}"
-  data-show-dates="{% if block.settings.show_dates %}true{% else %}false{% endif %}"
-  data-endpoint="/apps/rg-review/reviews"
-  {{ block.shopify_attributes }}
->
-  {% if product_ref == blank %}
-    <p class="rg-reviews-display__notice">{{ 'display.product_missing' | t }}</p>
-  {% else %}
-    <div class="rg-reviews-display__card">
-      <h2 class="rg-reviews-display__heading">{{ block.settings.heading }}</h2>
-
-      <div class="rg-reviews-display__top">
-        <div
-          class="rg-reviews-display__summary"
-          data-rg-reviews-summary
-          {% unless block.settings.show_summary %}hidden{% endunless %}
-        >
-          <p class="rg-reviews-display__average" data-rg-reviews-average>—</p>
-          <p class="rg-reviews-display__count" data-rg-reviews-count>
-            {{ 'display.based_on_zero' | t }}
-          </p>
-        </div>
-
-        <button class="rg-reviews-display__write" type="button" data-rg-review-open>
-          Write a Review
-        </button>
-      </div>
-
-      <div class="rg-reviews-display__filters">
-        <label for="rg-rating-filter-{{ block.id }}">Rating</label>
-        <select id="rg-rating-filter-{{ block.id }}" data-rg-rating-dropdown>
-          <option value="all">All ratings</option>
-          {% for rating in (1..5) reversed %}
-            <option value="{{ rating }}">{{ rating }} stars</option>
-          {% endfor %}
-        </select>
-        <div class="rg-reviews-display__filter-buttons" aria-hidden="true">
-          <button type="button" class="rg-reviews-display__filter is-active" data-rg-rating-filter="all">All</button>
-          {% for rating in (1..5) reversed %}
-            <button type="button" class="rg-reviews-display__filter" data-rg-rating-filter="{{ rating }}">{{ rating }} ★</button>
-          {% endfor %}
-        </div>
-      </div>
-
-      <div
-        class="rg-reviews-display__status"
-        data-rg-reviews-status
-        role="status"
-        aria-live="polite"
-      >
-        {{ 'display.loading' | t }}
-      </div>
-
-      <div
-        class="rg-reviews-display__empty"
-        data-rg-reviews-empty
-        hidden
-      >
-        <p class="rg-reviews-display__empty-title">{{ 'display.empty_title' | t }}</p>
-        <p class="rg-reviews-display__empty-text">{{ 'display.empty_text' | t }}</p>
-      </div>
-
-      <ul
-        class="rg-reviews-display__list"
-        data-rg-reviews-list
-        hidden
-      ></ul>
-
-      <button
-        type="button"
-        class="rg-reviews-display__more"
-        data-rg-reviews-more
-        hidden
-      >
-        {{ 'display.load_more' | t }}
-      </button>
-    </div>
-  {% endif %}
 </div>
 
 {% schema %}
 {
-  "name": "RG Review Reviews",
+  "name": "Product reviews",
   "target": "section",
-  "stylesheet": "reviews-display.css",
-  "javascript": "reviews-display.js",
   "enabled_on": {
     "templates": ["product"]
   },
+  "javascript": "review-widgets.js",
+  "stylesheet": "review-widgets.css",
   "settings": [
-    {
-      "type": "text",
-      "id": "heading",
-      "label": "t:display.settings.heading",
-      "default": "Customer Reviews"
-    },
-    {
-      "type": "range",
-      "id": "reviews_per_load",
-      "min": 5,
-      "max": 20,
-      "step": 1,
-      "label": "t:display.settings.reviews_per_load",
-      "default": 10
-    },
-    {
-      "type": "checkbox",
-      "id": "show_summary",
-      "label": "t:display.settings.show_summary",
-      "default": true
-    },
-    {
-      "type": "checkbox",
-      "id": "show_dates",
-      "label": "t:display.settings.show_dates",
-      "default": true
-    },
-    {
-      "type": "product",
-      "id": "product",
-      "label": "t:display.settings.product",
-      "autofill": true
-    }
+    {"type": "text", "id": "heading", "label": "Heading", "default": "Customer Reviews"},
+    {"type": "color", "id": "accent_color", "label": "Star color", "default": "#F5B301"},
+    {"type": "color", "id": "empty_star_color", "label": "Empty star color", "default": "#D9DDE3"},
+    {"type": "color", "id": "button_color", "label": "Button color", "default": "#111111"},
+    {"type": "range", "id": "corner_radius", "label": "Corner radius", "min": 0, "max": 24, "step": 1, "unit": "px", "default": 14},
+    {"type": "range", "id": "reviews_per_page", "label": "Reviews per page", "min": 1, "max": 10, "step": 1, "default": 5},
+    {"type": "select", "id": "default_sort", "label": "Default sort", "default": "newest", "options": [{"value": "newest", "label": "Most recent"}, {"value": "highest", "label": "Highest rating"}, {"value": "lowest", "label": "Lowest rating"}]},
+    {"type": "checkbox", "id": "show_histogram", "label": "Show rating breakdown", "default": true},
+    {"type": "checkbox", "id": "show_sort", "label": "Show sort", "default": true},
+    {"type": "checkbox", "id": "show_avatar", "label": "Show reviewer initials", "default": true},
+    {"type": "checkbox", "id": "show_form", "label": "Show review form", "default": true},
+    {"type": "checkbox", "id": "show_customer_name", "label": "Show customer name", "default": true},
+    {"type": "checkbox", "id": "show_date", "label": "Show review date", "default": true},
+    {"type": "checkbox", "id": "show_verified_badge", "label": "Show verified purchase badge", "default": true},
+    {"type": "text", "id": "empty_message", "label": "Empty state message", "default": "No reviews yet"},
+    {"type": "text", "id": "write_label", "label": "Write a review text", "default": "Write a review"},
+    {"type": "text", "id": "submit_label", "label": "Submit button text", "default": "Submit review"}
   ]
 }
 {% endschema %}
