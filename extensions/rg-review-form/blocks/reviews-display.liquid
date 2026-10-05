@@ -30,20 +30,22 @@
     <div class="rg-reviews-display__card">
       <h2 class="rg-reviews-display__heading">{{ block.settings.heading }}</h2>
 
-      <div
-        class="rg-reviews-display__summary"
-        data-rg-reviews-summary
-        {% unless block.settings.show_summary %}hidden{% endunless %}
-      >
-        <p class="rg-reviews-display__average" data-rg-reviews-average>—</p>
-        <p class="rg-reviews-display__count" data-rg-reviews-count>
-          {{ 'display.based_on_zero' | t }}
-        </p>
-      </div>
+      <div class="rg-reviews-display__top">
+        <div
+          class="rg-reviews-display__summary"
+          data-rg-reviews-summary
+          {% unless block.settings.show_summary %}hidden{% endunless %}
+        >
+          <p class="rg-reviews-display__average" data-rg-reviews-average>—</p>
+          <p class="rg-reviews-display__count" data-rg-reviews-count>
+            {{ 'display.based_on_zero' | t }}
+          </p>
+        </div>
 
-      <button class="rg-reviews-display__write" type="button" data-rg-review-open>
-        Write a Review
-      </button>
+        <button class="rg-reviews-display__write" type="button" data-rg-review-open>
+          Write a Review
+        </button>
+      </div>
 
       <div class="rg-reviews-display__filters">
         <label for="rg-rating-filter-{{ block.id }}">Rating</label>

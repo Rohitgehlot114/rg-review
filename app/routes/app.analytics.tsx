@@ -4,21 +4,9 @@ import { boundary } from "@shopify/shopify-app-react-router/server";
 
 import { authenticate } from "../shopify.server";
 import { formatAverageRating, formatDateTime } from "../utils/reviews";
-import {
-  MIN_REVIEWS_FOR_RANKING,
-  analyticsPdfLines,
-  buildAnalyticsPdf,
-  fileResponse,
-  loadAnalytics,
-  loadRequestExport,
-  loadReviewExport,
-  requestsToCsv,
-  resolveAnalyticsRange,
-  reviewsToCsv,
-  type AnalyticsData,
-  type ProductSortKey,
-} from "../utils/analytics.server";
+import type { AnalyticsData, ProductSortKey } from "../utils/analytics.server";
 
+const MIN_REVIEWS_FOR_RANKING = 2;
 const SORTS: ProductSortKey[] = ["reviews", "rating", "published", "pending"];
 
 function parseSort(value: string | null): ProductSortKey {
@@ -42,6 +30,17 @@ async function loadShopName(admin: {
 }
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const {
+    analyticsPdfLines,
+    buildAnalyticsPdf,
+    fileResponse,
+    loadAnalytics,
+    loadRequestExport,
+    loadReviewExport,
+    requestsToCsv,
+    resolveAnalyticsRange,
+    reviewsToCsv,
+  } = await import("../utils/analytics.server");
   const { admin, session } = await authenticate.admin(request);
   const url = new URL(request.url);
   const range = resolveAnalyticsRange(url);

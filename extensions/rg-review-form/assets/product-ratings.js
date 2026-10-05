@@ -144,6 +144,7 @@
 
   function addProductReviewButton() {
     if (!window.location.pathname.match(/\/products\/[^/]+/)) return;
+    if (document.querySelector(".rg-reviews-display__write")) return;
     if (document.querySelector(".rg-product-review-button")) return;
 
     var price =
@@ -164,11 +165,6 @@
       }
     });
     price.parentElement.appendChild(button);
-    document
-      .querySelectorAll(".rg-reviews-display__write")
-      .forEach(function (fallback) {
-        fallback.remove();
-      });
   }
 
   function bind() {

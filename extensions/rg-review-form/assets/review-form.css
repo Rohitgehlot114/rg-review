@@ -29,13 +29,25 @@
 }
 
 .rg-review__modal {
+  --rg-border: #d9d9d9;
+  --rg-text: #1a1a1a;
+  --rg-muted: #616161;
+  --rg-bg: #ffffff;
+  --rg-accent: #111111;
+  --rg-error: #b00020;
+  --rg-success: #0b6e4f;
+  --rg-star: #c4c4c4;
+  --rg-star-active: #f5a623;
   position: fixed;
-  z-index: 9999;
+  z-index: 2147483000;
   inset: 0;
   display: grid;
   place-items: center;
   padding: 1rem;
   background: rgb(0 0 0 / 65%);
+  color: #1a1a1a;
+  font-size: 1rem;
+  line-height: 1.5;
 }
 
 .rg-review__modal[hidden] {
@@ -83,6 +95,19 @@
   max-height: min(90vh, 42rem);
   padding: 2rem;
   overflow: auto;
+  background: #ffffff;
+  color: #1a1a1a;
+  border: 1px solid #d9d9d9;
+}
+
+.rg-review__modal .rg-review__heading,
+.rg-review__modal .rg-review__label {
+  color: #1a1a1a;
+}
+
+.rg-review__modal .rg-review__submit {
+  background: #111111;
+  color: #ffffff;
 }
 
 .rg-review__form {

@@ -1,9 +1,9 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "d193c44720355a11c1d01a449ba41a1d"
-application_url = "https://example.com"
+client_id = "ddad73c86fd30c59b34818413a841097"
+application_url = "https://review.tattoo-art.com"
 embedded = true
-name = "rg-review"
+name = "Tattoo Review"
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
@@ -52,7 +52,7 @@ api_version = "2026-10"
   topics = [ "app/scopes_update" ]
 
 [auth]
-redirect_urls = [ "https://example.com/api/auth" ]
+redirect_urls = [ "https://review.tattoo-art.com/auth/callback" ]
 
 [build]
-automatically_update_urls_on_dev = true
+automatically_update_urls_on_dev = false

@@ -137,33 +137,31 @@
     var form = root.querySelector("[data-rg-review-form]");
     if (!modal || !form) return;
 
+    function open() {
+      if (modal.parentElement !== document.body) {
+        document.body.appendChild(modal);
+      }
+      modal.hidden = false;
+      document.body.classList.add("rg-review-modal-open");
+      var first = modal.querySelector('input[name="rating"]');
+      if (first) first.focus();
+    }
+
     function close() {
       modal.hidden = true;
       document.body.classList.remove("rg-review-modal-open");
+      if (modal.parentElement === document.body) {
+        root.appendChild(modal);
+      }
     }
 
     root.querySelectorAll("[data-rg-review-trigger]").forEach(function (button) {
-      button.addEventListener("click", function () {
-        modal.hidden = false;
-        document.body.classList.add("rg-review-modal-open");
-        var first = root.querySelector('input[name="rating"]');
-        if (first) first.focus();
-      });
+      button.addEventListener("click", open);
     });
     document.querySelectorAll("[data-rg-review-open]").forEach(function (button) {
-      button.addEventListener("click", function () {
-        modal.hidden = false;
-        document.body.classList.add("rg-review-modal-open");
-        var first = root.querySelector('input[name="rating"]');
-        if (first) first.focus();
-      });
+      button.addEventListener("click", open);
     });
-    document.addEventListener("rg-review:open", function () {
-      modal.hidden = false;
-      document.body.classList.add("rg-review-modal-open");
-      var first = root.querySelector('input[name="rating"]');
-      if (first) first.focus();
-    });
+    document.addEventListener("rg-review:open", open);
     root.querySelectorAll("[data-rg-review-close]").forEach(function (button) {
       button.addEventListener("click", close);
     });
