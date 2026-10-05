@@ -1,5 +1,27 @@
 <div class="pr-reviews-tab-host" data-all-reviews-tab data-shop="{{ shop.permanent_domain | escape }}" hidden></div>
+<div
+  class="shopify-review-rating-source"
+  data-rating-source
+  data-page-type="{{ request.page_type }}"
+  data-click="true"
+  data-show-count="true"
+  data-show-number="true"
+  data-half-stars="true"
+  data-count-format="words"
+  data-precision="1"
+  data-empty-text="Be the first to review."
+  data-write-text="Write a review"
+  data-star="#F5B301"
+  data-empty="#D9DDE3"
+  data-star-size="16"
+  data-text-size="13"
+  data-space="6"
+  data-align="left"
+  data-hide-empty="false"
+  hidden
+></div>
 <script src="{{ 'all-reviews-tab.js' | asset_url }}" defer></script>
+<script src="{{ 'product-rating.js' | asset_url }}" defer></script>
 
 {% schema %}
 {

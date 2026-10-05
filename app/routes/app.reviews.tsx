@@ -5,7 +5,6 @@ import type {
   LoaderFunctionArgs,
 } from "react-router";
 import {
-  Form,
   useFetcher,
   useLoaderData,
   useNavigate,
@@ -15,6 +14,7 @@ import { useAppBridge } from "@shopify/app-bridge-react";
 import type { Prisma } from "@prisma/client";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 
+import { useAdminHref } from "../components/admin/ui";
 import prisma from "../db.server";
 import { issueRewardForPublishedReview } from "../services/rewards.server";
 import { authenticate } from "../shopify.server";
@@ -40,11 +40,8 @@ function parsePage(value: string | null): number {
   return parsed;
 }
 
-function parseRating(value: string | null): number | undefined {
-  if (!value) return undefined;
-  const parsed = Number.parseInt(value, 10);
-  if (![1, 2, 3, 4, 5].includes(parsed)) return undefined;
-  return parsed;
+function reviewTab(value: string | null): "published" | "rejected" {
+  return value?.trim().toLowerCase() === "rejected" ? "rejected" : "published";
 }
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -52,32 +49,18 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const shop = session.shop;
   const url = new URL(request.url);
 
-  const q = (url.searchParams.get("q") ?? "").trim();
-  const statusParam = (url.searchParams.get("status") ?? "").trim().toLowerCase();
-  const status = isReviewStatus(statusParam) ? statusParam : "";
-  const rating = parseRating(url.searchParams.get("rating"));
+  const status = reviewTab(url.searchParams.get("status"));
   let page = parsePage(url.searchParams.get("page"));
   const reviewId = (url.searchParams.get("review") ?? "").trim() || null;
 
-  const where: Prisma.ReviewWhereInput = {
-    shop,
-    ...(status ? { status } : {}),
-    ...(rating ? { rating } : {}),
-    ...(q
-      ? {
-          OR: [
-            { customerName: { contains: q } },
-            { customerEmail: { contains: q } },
-            { productTitle: { contains: q } },
-            { title: { contains: q } },
-            { body: { contains: q } },
-          ],
-        }
-      : {}),
-  };
+  const where: Prisma.ReviewWhereInput = { shop, status };
 
   try {
-    const totalCount = await prisma.review.count({ where });
+    const [totalCount, publishedCount, rejectedCount] = await Promise.all([
+      prisma.review.count({ where }),
+      prisma.review.count({ where: { shop, status: "published" } }),
+      prisma.review.count({ where: { shop, status: "rejected" } }),
+    ]);
     const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
     if (page > totalPages) page = totalPages;
 
@@ -111,11 +94,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
     return {
       shop,
-      filters: {
-        q,
-        status,
-        rating: rating ? String(rating) : "",
-      },
+      filters: { status },
+      counts: { published: publishedCount, rejected: rejectedCount },
       pagination: {
         page,
         pageSize: PAGE_SIZE,
@@ -131,11 +111,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   } catch {
     return {
       shop,
-      filters: {
-        q,
-        status,
-        rating: rating ? String(rating) : "",
-      },
+      filters: { status },
+      counts: { published: 0, rejected: 0 },
       pagination: {
         page: 1,
         pageSize: PAGE_SIZE,
@@ -303,34 +280,40 @@ export default function ReviewsPage() {
     );
   }
 
-  const filterQuery = {
-    q: data.filters.q,
-    status: data.filters.status,
-    rating: data.filters.rating,
-  };
+  const filterQuery = { status: data.filters.status };
 
+  const hrefFor = useAdminHref();
   const pageHref = (page: number) =>
-    `/app/reviews${buildReviewsSearchParams({
-      ...filterQuery,
-      page,
-      review: data.selectedReview?.id ?? null,
-    })}`;
+    hrefFor(
+      `/app/reviews${buildReviewsSearchParams({
+        ...filterQuery,
+        page,
+        review: data.selectedReview?.id ?? null,
+      })}`,
+    );
 
   const reviewHref = (reviewId: string) =>
+    hrefFor(
+      `/app/reviews${buildReviewsSearchParams({
+        ...filterQuery,
+        page: data.pagination.page,
+        review: reviewId,
+      })}`,
+    );
+
+  const closeDetailHref = hrefFor(
     `/app/reviews${buildReviewsSearchParams({
       ...filterQuery,
       page: data.pagination.page,
-      review: reviewId,
-    })}`;
-
-  const closeDetailHref = `/app/reviews${buildReviewsSearchParams({
-    ...filterQuery,
-    page: data.pagination.page,
-  })}`;
+    })}`,
+  );
 
   const submitAction = (intent: string, id: string) => {
     fetcher.submit({ intent, id }, { method: "POST" });
   };
+
+  const tabHref = (status: "published" | "rejected") =>
+    hrefFor(`/app/reviews${buildReviewsSearchParams({ status })}`);
 
   return (
     <s-page heading="Reviews">
@@ -340,49 +323,25 @@ export default function ReviewsPage() {
         </s-paragraph>
       </s-section>
 
-      <s-section heading="Filters">
-        <Form method="get">
-          <s-stack direction="block" gap="base">
-            <s-stack direction="inline" gap="base">
-              <s-text-field
-                name="q"
-                label="Search"
-                value={data.filters.q}
-                placeholder="Customer, product, or review text"
-                autocomplete="off"
-              />
-              <s-select name="status" label="Status" value={data.filters.status}>
-                <s-option value="">All</s-option>
-                <s-option value="pending">Pending</s-option>
-                <s-option value="published">Published</s-option>
-                <s-option value="rejected">Rejected</s-option>
-              </s-select>
-              <s-select
-                name="rating"
-                label="Rating"
-                value={data.filters.rating}
-              >
-                <s-option value="">All ratings</s-option>
-                <s-option value="5">5 stars</s-option>
-                <s-option value="4">4 stars</s-option>
-                <s-option value="3">3 stars</s-option>
-                <s-option value="2">2 stars</s-option>
-                <s-option value="1">1 star</s-option>
-              </s-select>
-            </s-stack>
-            <s-stack direction="inline" gap="base">
-              <s-button type="submit" variant="primary">
-                Apply filters
-              </s-button>
-              <s-button href="/app/reviews" variant="tertiary">
-                Clear filters
-              </s-button>
-            </s-stack>
-          </s-stack>
-        </Form>
+      <s-section>
+        <s-stack direction="inline" gap="small-200">
+          <s-button
+            variant={data.filters.status === "published" ? "primary" : "secondary"}
+            onClick={() => navigate(tabHref("published"))}
+          >
+            Published ({data.counts.published})
+          </s-button>
+          <s-button
+            variant={data.filters.status === "rejected" ? "primary" : "secondary"}
+            {...(data.filters.status === "rejected" ? { tone: "critical" as const } : {})}
+            onClick={() => navigate(tabHref("rejected"))}
+          >
+            Rejected ({data.counts.rejected})
+          </s-button>
+        </s-stack>
       </s-section>
 
-      <s-section heading="All reviews">
+      <s-section heading={data.filters.status === "published" ? "Published reviews" : "Rejected reviews"}>
         {data.reviews.length === 0 ? (
           <s-box
             padding="base"
@@ -391,11 +350,13 @@ export default function ReviewsPage() {
             background="subdued"
           >
             <s-stack direction="block" gap="base">
-              <s-heading>No reviews yet</s-heading>
+              <s-heading>
+                {data.filters.status === "published" ? "No published reviews" : "No rejected reviews"}
+              </s-heading>
               <s-paragraph>
-                {data.filters.q || data.filters.status || data.filters.rating
-                  ? "No reviews match your current filters. Clear filters to see all reviews for this store."
-                  : "Customer reviews for this store will appear here once they are collected. There are no reviews in the database yet."}
+                {data.filters.status === "published"
+                  ? "Published reviews will appear in this tab."
+                  : "Rejected reviews will appear in this tab."}
               </s-paragraph>
             </s-stack>
           </s-box>
@@ -460,8 +421,8 @@ export default function ReviewsPage() {
                   <s-table-cell>
                     <s-stack direction="inline" gap="small-200">
                       <s-button
-                        href={reviewHref(review.id)}
                         variant="tertiary"
+                        onClick={() => navigate(reviewHref(review.id))}
                       >
                         View
                       </s-button>
@@ -503,9 +464,9 @@ export default function ReviewsPage() {
             {data.pagination.totalPages > 1 ? (
               <s-stack direction="inline" gap="base" alignItems="center">
                 <s-button
-                  href={pageHref(data.pagination.page - 1)}
                   variant="secondary"
-                  disabled={!data.pagination.hasPreviousPage}
+                  {...(data.pagination.hasPreviousPage ? {} : { disabled: true })}
+                  onClick={() => navigate(pageHref(data.pagination.page - 1))}
                 >
                   Previous
                 </s-button>
@@ -513,9 +474,9 @@ export default function ReviewsPage() {
                   Page {data.pagination.page} of {data.pagination.totalPages}
                 </s-text>
                 <s-button
-                  href={pageHref(data.pagination.page + 1)}
                   variant="secondary"
-                  disabled={!data.pagination.hasNextPage}
+                  {...(data.pagination.hasNextPage ? {} : { disabled: true })}
+                  onClick={() => navigate(pageHref(data.pagination.page + 1))}
                 >
                   Next
                 </s-button>

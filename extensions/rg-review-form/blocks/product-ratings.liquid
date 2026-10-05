@@ -1,6 +1,28 @@
 {% comment %}Product rating{% endcomment %}
 <div {{ block.shopify_attributes }}>
-{% if block.settings.enabled and product %}
+{% if block.settings.enabled and request.page_type != 'product' %}
+  <div
+    class="shopify-review-rating-source"
+    data-rating-source
+    data-page-type="{{ request.page_type }}"
+    data-click="{% if block.settings.click_to_reviews %}true{% else %}false{% endif %}"
+    data-show-count="{% if block.settings.show_count %}true{% else %}false{% endif %}"
+    data-show-number="{% if block.settings.show_number %}true{% else %}false{% endif %}"
+    data-half-stars="{% if block.settings.half_stars %}true{% else %}false{% endif %}"
+    data-count-format="{{ block.settings.count_format | escape }}"
+    data-precision="{{ block.settings.precision | default: '1' | escape }}"
+    data-empty-text="{{ block.settings.empty_text | escape }}"
+    data-write-text="{{ block.settings.write_text | escape }}"
+    data-star="{{ block.settings.star_color }}"
+    data-empty="{{ block.settings.empty_star_color }}"
+    data-star-size="{{ block.settings.star_size }}"
+    data-text-size="{{ block.settings.text_size }}"
+    data-space="{{ block.settings.spacing }}"
+    data-align="{{ block.settings.alignment | escape }}"
+    data-hide-empty="{% if block.settings.hide_when_empty %}true{% else %}false{% endif %}"
+    hidden
+  ></div>
+{% elsif block.settings.enabled and product %}
   {% render 'product-rating',
     product: product,
     placement: 'section',
