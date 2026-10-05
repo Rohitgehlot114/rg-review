@@ -1,34 +1,115 @@
-# Shopify App Template - React Router
+# RG Review
 
-This is a template for building a [Shopify app](https://shopify.dev/docs/apps/getting-started) using [React Router](https://reactrouter.com/). It was forked from the [Shopify Remix app template](https://github.com/Shopify/shopify-app-template-remix) and converted to React Router.
+RG Review is an embedded Shopify review-management application. It lets store
+owners collect, moderate, publish, analyze, and reward customer reviews while
+displaying approved reviews on the storefront.
 
-Rather than cloning this repo, follow the [Quick Start steps](https://github.com/Shopify/shopify-app-template-react-router#quick-start).
+## What this project includes
 
-Visit the [`shopify.dev` documentation](https://shopify.dev/docs/api/shopify-app-react-router) for more details on the React Router app package.
+- Embedded Shopify admin application built with React Router 7 and React.
+- Shopify App Bridge navigation and admin authentication.
+- Review moderation: pending, published, rejected, search, filters, pagination,
+  and deletion.
+- Secure review-request links with expiry, reminder support, and email delivery.
+- Storefront review display, ratings, helpful votes, and purchase verification.
+- Analytics dashboards with CSV/PDF exports.
+- Optional Shopify discount rewards for eligible published reviews.
+- Shopify theme app extension for review forms, ratings, and review displays.
+- PostgreSQL persistence in production through Prisma.
 
-## Upgrading from Remix
+## Architecture
 
-If you have an existing Remix app that you want to upgrade to React Router, please follow the [upgrade guide](https://github.com/Shopify/shopify-app-template-react-router/wiki/Upgrading-from-Remix). Otherwise, please follow the quick start guide below.
-
-## Quick start
-
-### Prerequisites
-
-Before you begin, you'll need to [download and install the Shopify CLI](https://shopify.dev/docs/apps/tools/cli/getting-started) if you haven't already.
-
-### Setup
-
-```shell
-shopify app init --template=https://github.com/Shopify/shopify-app-template-react-router
+```text
+Shopify Admin / Storefront
+          |
+          v
+   React Router app
+     |          |
+     v          v
+ PostgreSQL   Shopify Admin API
+     |
+     v
+ Sessions, reviews, requests, rewards, votes
 ```
 
-### Local Development
+Production Docker Compose runs the app and PostgreSQL in an app-specific
+network. PostgreSQL is not published to the host and its data is stored in the
+named `rg_review_postgres_data` volume, so other applications on the server do
+not share this app's database or container filesystem.
+
+## Technology stack
+
+- Node.js 20+
+- React 18
+- React Router 7
+- TypeScript
+- Shopify App Bridge and Shopify App React Router
+- Prisma ORM
+- PostgreSQL in production
+- Docker and Docker Compose for isolated production deployment
+- Resend for review and reminder emails
+
+## Repository structure
+
+```text
+app/                         React Router routes, services, and utilities
+extensions/                  Shopify theme app extension assets and blocks
+prisma/                      PostgreSQL schema and migrations
+scripts/                     One-time database migration utilities
+docker-compose.production.yml Isolated production app + PostgreSQL stack
+Dockerfile                   Multi-stage production image
+tests/                       Automated regression tests
+shopify.app.toml             Shopify app and webhook configuration
+```
+
+## Requirements
+
+- Node.js `20.19+` or `22.12+`
+- npm
+- Shopify CLI for local Shopify development
+- PostgreSQL for production
+- Docker Compose for the recommended production deployment
+
+## Important environment variables
+
+Production uses the following values:
+
+| Variable | Purpose |
+| --- | --- |
+| `DATABASE_URL` | PostgreSQL connection string |
+| `SHOPIFY_API_KEY` | Shopify app client ID |
+| `SHOPIFY_API_SECRET` | Shopify app secret |
+| `SHOPIFY_APP_URL` | Public HTTPS URL of the app |
+| `SCOPES` | Comma-separated Shopify access scopes |
+| `RESEND_API_KEY` | Email provider key |
+| `EMAIL_FROM` | Verified sender address |
+
+Copy `.env.production.example` to `.env.production` on the server and fill in
+real values. Never commit `.env.production` or expose secrets in source code.
+
+## Development commands
 
 ```shell
+npm ci
+npx prisma generate
+npm run typecheck
+npm run lint
+npm test
+npm run build
+```
+
+## Local development
+
+Install the [Shopify CLI](https://shopify.dev/docs/apps/tools/cli/getting-started),
+then install dependencies and start the app:
+
+```shell
+npm ci
+npx prisma generate
 shopify app dev
 ```
 
-Press P to open the URL to your app. Once you click install, you can start development.
+Press `P` in the Shopify CLI to open the development URL.
 
 Local development is powered by [the Shopify CLI](https://shopify.dev/docs/apps/tools/cli). It logs into your account, connects to an app, provides environment variables, updates remote config, creates a tunnel and provides commands to generate extensions.
 
@@ -79,21 +160,11 @@ For more information on the Shopify Dev MCP please read [the documentation](http
 
 ### Application Storage
 
-This template uses [Prisma](https://www.prisma.io/) to store session data, by default using an [SQLite](https://www.sqlite.org/index.html) database.
-The database is defined as a Prisma schema in `prisma/schema.prisma`.
-
-This use of SQLite works in production if your app runs as a single instance.
-The database that works best for you depends on the data your app needs and how it is queried.
-Here’s a short list of databases providers that provide a free tier to get started:
-
-| Database   | Type             | Hosters                                                                                                                                                                                                                                    |
-| ---------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| MySQL      | SQL              | [Digital Ocean](https://www.digitalocean.com/products/managed-databases-mysql), [Planet Scale](https://planetscale.com/), [Amazon Aurora](https://aws.amazon.com/rds/aurora/), [Google Cloud SQL](https://cloud.google.com/sql/docs/mysql) |
-| PostgreSQL | SQL              | [Digital Ocean](https://www.digitalocean.com/products/managed-databases-postgresql), [Amazon Aurora](https://aws.amazon.com/rds/aurora/), [Google Cloud SQL](https://cloud.google.com/sql/docs/postgres)                                   |
-| Redis      | Key-value        | [Digital Ocean](https://www.digitalocean.com/products/managed-databases-redis), [Amazon MemoryDB](https://aws.amazon.com/memorydb/)                                                                                                        |
-| MongoDB    | NoSQL / Document | [Digital Ocean](https://www.digitalocean.com/products/managed-databases-mongodb), [MongoDB Atlas](https://www.mongodb.com/atlas/database)                                                                                                  |
-
-To use one of these, you can use a different [datasource provider](https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#datasource) in your `schema.prisma` file, or a different [SessionStorage adapter package](https://github.com/Shopify/shopify-api-js/blob/main/packages/shopify-api/docs/guides/session-storage.md).
+Production uses [Prisma](https://www.prisma.io/) with PostgreSQL. The
+connection is supplied through `DATABASE_URL`, and the production Compose setup
+keeps PostgreSQL on the app-specific Docker network with a named persistent
+volume. The temporary `prisma/schema.sqlite.prisma` schema is only used by the
+one-time SQLite-to-PostgreSQL importer.
 
 ### Build
 
@@ -128,6 +199,59 @@ When you're ready to set up your app in production, you can follow [our deployme
 
 When you reach the step for [setting up environment variables](https://shopify.dev/docs/apps/deployment/web#set-env-vars), you also need to set the variable `NODE_ENV=production`.
 
+### Isolated Docker and PostgreSQL deployment
+
+This repository includes an app-scoped production topology in
+`docker-compose.production.yml`. It runs the web app and PostgreSQL in a
+dedicated Docker network, stores PostgreSQL data in the named volume
+`rg_review_postgres_data`, and does not publish the PostgreSQL port to the host.
+The web container is published on port `3100` by default; change
+`RG_REVIEW_APP_PORT` if that port is already used by another application.
+
+On the deployment host:
+
+```shell
+cp .env.production.example .env.production
+# Fill in secrets and URL-encode special characters in DATABASE_URL.
+docker compose --env-file .env.production -f docker-compose.production.yml up -d --build
+docker compose --env-file .env.production -f docker-compose.production.yml ps
+docker compose --env-file .env.production -f docker-compose.production.yml logs -f app
+```
+
+The PostgreSQL service is private to this Compose project and has durable
+storage. Do not run `docker compose down -v` unless you intentionally want to
+delete the database volume.
+
+#### Migrating the existing SQLite data
+
+Before the cutover, make a copy of `prisma/dev.sqlite` and keep it unchanged as
+the rollback source. Start the Compose stack so PostgreSQL is healthy and the
+baseline migrations are applied, then run the importer in the app container
+with the SQLite file mounted read-only:
+
+```shell
+docker compose --env-file .env.production -f docker-compose.production.yml run --rm \
+  -v "$(pwd)/prisma/dev.sqlite:/app/prisma/dev.sqlite:ro" \
+  app npm run db:migrate:sqlite
+```
+
+The importer refuses to write into a non-empty target unless
+`--allow-existing` is explicitly provided. It validates row counts and shop
+coverage after import. Run it once, verify the app, and only then switch the
+reverse proxy to the app port. Reverse proxy configuration is intentionally
+not included here so other sites on the server are not modified.
+
+Create a PostgreSQL backup before future deployments:
+
+```shell
+docker compose --env-file .env.production -f docker-compose.production.yml exec -T postgres \
+  sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB"' > rg-review-postgres.sql
+```
+
+To roll back the application image without deleting data, deploy the previous
+image and keep the `rg_review_postgres_data` volume. Never use
+`docker compose down -v` during a rollback.
+
 ## Gotchas / Troubleshooting
 
 ### Database tables don't exist
@@ -135,10 +259,12 @@ When you reach the step for [setting up environment variables](https://shopify.d
 If you get an error like:
 
 ```
-The table `main.Session` does not exist in the current database.
+The table `public.Session` does not exist in the current database.
 ```
 
-Create the database for Prisma. Run the `setup` script in `package.json` using `npm`, `yarn` or `pnpm`.
+Check that PostgreSQL is healthy and that `DATABASE_URL` points to the
+PostgreSQL service, then run `npm run setup`. In Docker Compose, the app waits
+for the PostgreSQL health check before starting.
 
 ### Navigating/redirecting breaks an embedded app
 

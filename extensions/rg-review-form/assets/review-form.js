@@ -174,12 +174,38 @@
     });
   }
 
+  function showRedirectSuccess(root) {
+    var params = new URLSearchParams(window.location.search);
+    if (params.get("rg_review_status") !== "success") return;
+
+    var success = root.querySelector("[data-rg-review-success]");
+    var form = root.querySelector("[data-rg-review-form]");
+    var modal = root.querySelector("[data-rg-review-modal]");
+    if (success) success.hidden = false;
+    if (form) form.hidden = true;
+    if (modal) {
+      if (modal.parentElement !== document.body) {
+        document.body.appendChild(modal);
+      }
+      modal.hidden = false;
+      document.body.classList.add("rg-review-modal-open");
+    }
+
+    params.delete("rg_review_status");
+    var cleanUrl =
+      window.location.pathname +
+      (params.toString() ? "?" + params.toString() : "") +
+      window.location.hash;
+    window.history.replaceState({}, document.title, cleanUrl);
+  }
+
   function bindAll(scope) {
     (scope || document)
       .querySelectorAll("[data-rg-review-root]")
       .forEach(function (root) {
         bindForms(root);
         bindRoot(root);
+        showRedirectSuccess(root);
       });
   }
 

@@ -52,6 +52,23 @@ function jsonResponse(
   });
 }
 
+function storefrontSuccessResponse(request: Request): Response | null {
+  if (request.headers.get("Accept")?.includes("application/json")) return null;
+
+  const referer = request.headers.get("Referer");
+  if (!referer) return null;
+
+  try {
+    const url = new URL(referer);
+    if (!["http:", "https:"].includes(url.protocol)) return null;
+    url.searchParams.set("rg_review_status", "success");
+    url.hash = "rg-review-success";
+    return Response.redirect(url, 303);
+  } catch {
+    return null;
+  }
+}
+
 async function verifyProduct(
   admin: AdminGraphql,
   productGid: string,
@@ -109,9 +126,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const auth = await authenticateAppProxy(request);
   if (!auth.ok) return auth.response;
 
-  const { session, admin } = auth.context;
+  const { session } = auth.context;
 
-  if (!session?.shop || !admin) {
+  if (!session?.shop) {
     return jsonResponse(
       {
         ok: false,
@@ -131,29 +148,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   }
 
   const productGid = `gid://shopify/Product/${parsed.productIdRaw}`;
-
-  let product: { id: string; title: string } | null;
-  try {
-    product = await verifyProduct(admin, productGid);
-  } catch {
-    return jsonResponse(
-      {
-        ok: false,
-        error: "Unable to verify the product for these reviews.",
-      },
-      502,
-    );
-  }
-
-  if (!product) {
-    return jsonResponse(
-      {
-        ok: false,
-        error: "This product could not be found in your store.",
-      },
-      400,
-    );
-  }
 
   const where = publishedReviewsWhere(shop, productGid);
   const voter = getVoter(request);
@@ -444,6 +438,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       customerEmail: submission.customerEmail,
       productId: submission.productGid,
     });
+
+    const storefrontResponse = storefrontSuccessResponse(request);
+    if (storefrontResponse) return storefrontResponse;
 
     return jsonResponse({
       ok: true,

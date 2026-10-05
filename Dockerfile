@@ -22,5 +22,6 @@ COPY --from=build /app/package.json /app/package-lock.json* ./
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/build ./build
 COPY --from=build /app/prisma ./prisma
+COPY --from=build /app/scripts ./scripts
 
 CMD ["npm", "run", "docker-start"]
