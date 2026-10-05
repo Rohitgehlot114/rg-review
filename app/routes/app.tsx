@@ -5,6 +5,7 @@ import { Outlet, useLoaderData, useRouteError } from "react-router";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { AppProvider } from "@shopify/shopify-app-react-router/react";
 
+import "../styles/admin.css";
 import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -23,10 +24,6 @@ export default function App() {
         <s-link href="/app">Dashboard</s-link>
         <s-link href="/app/reviews">Reviews</s-link>
         <s-link href="/app/review-requests">Review Requests</s-link>
-        <s-link href="/app/products">Products</s-link>
-        <s-link href="/app/widgets">Widgets</s-link>
-        <s-link href="/app/analytics">Analytics</s-link>
-        <s-link href="/app/rewards">Rewards</s-link>
         <s-link href="/app/settings">Settings</s-link>
       </s-app-nav>
       <Outlet />
